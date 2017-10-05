@@ -28,7 +28,7 @@ def read_genes():
     return genes
 
 
-def pair_process(genes, num_genes, gene_interactions):
+def pair_genes(genes, num_genes, gene_interactions):
     # produce gene interaction pairs
     gene_pairs = []
     pair_scores = []
@@ -114,7 +114,7 @@ if __name__ == "__main__":
     gene_interactions = np.load("./example-genetic-interactions.npy")
 
     # generate gene pairs and label the interactions
-    gene_pairs, pair_scores = pair_process(genes, num_genes, gene_interactions)
+    gene_pairs, pair_scores = pair_genes(genes, num_genes, gene_interactions)
 
     # help to construct feature vector
     gene_dict = build_geneterm_dict(genes, term_set)
