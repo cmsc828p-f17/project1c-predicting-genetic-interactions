@@ -1,0 +1,101 @@
+---
+title: "Predicting Genetic Interaction Scores in Yeast With Random Forests"
+author: "Kuoyuan Cheng"
+date: '`r format(Sys.Date(), "%B %d, %Y")`'
+header-includes:
+   - \setlength\parindent{12pt}
+   - \usepackage{float}
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+#knitr::opts_chunk$set(echo=FALSE, message=FALSE, warning=FALSE, tidy.opts=list(width.cutoff=60), tidy=TRUE)
+knitr::opts_chunk$set(echo=FALSE, message=FALSE, warning=FALSE, tidy.opts=list(width.cutoff=100), tidy=TRUE)
+knitr::opts_chunk$set(fig.width=5, fig.height=3.1, fig.pos="H", fig.align="center")
+
+library(data.table)
+library(stringr)
+library(RcppCNPy)
+library(ranger)
+library(ggplot2)
+```
+
+
+# Test With Simulated Data
+
+```{r}
+### functions
+
+get.responses <- function(genes, gi.mat) {
+  n <- length(genes)
+  gi.vec <- gi.mat[upper.tri(gi.mat)]
+  data.table(gene1=unlist(sapply(1:(n-1), function(x) genes[1:x])), gene2=rep(genes[-1], 1:(n-1)), gi.score=gi.vec)
+}
+
+get.genes.list <- function(response.dat) {
+  transpose(response.dat[, 1:2])
+}
+
+get.features <- function(go, genes.list) {
+  as.data.table(lapply(go, function(go.term) {
+    as.numeric(sapply(genes.list, function(genes) -sum(genes %in% go.term)))
+  }))
+}
+
+prepare.data <- function(genes, gi.mat, go) {
+  rdat <- get.responses(genes, gi.mat)
+  glist <- get.genes.list(rdat)
+  fdat <- get.features(go, glist)
+  cbind(rdat, fdat)
+}
+
+### simulated data
+
+# gene interaction scores
+gi <- npyLoad("data/examples/example-genetic-interactions.npy")
+#isSymmetric(gi) # TRUE
+# gene names
+gn <- readLines("data/examples/example-gene-names.txt")
+# GO-gene mapping
+go <- readLines("data/examples/example-hierarchy-sets.tsv")
+go <- str_split(go, "\t")
+# combine input into data.table
+sim.dat <- prepare.data(gn, gi, go)
+# number of samples
+N <- nrow(sim.dat)
+# labelling of folds for cross-validation
+folds <- sample(rep(1:4, ceiling(N/4)), N)
+# CV result
+cv.result <- lapply(1:4, function(i) {
+  train <- folds!=i
+  test <- sim.dat[!train]
+  set.seed(1)
+  rf <- ranger(gi.score ~ ., data=sim.dat[train,-1:-2], num.trees=500, mtry=floor(length(go)/3))
+  prd <- predictions(predict(rf, data=test))
+  test[, .(gene1, gene2, gi.score.real=gi.score, gi.score.prd=prd)]
+})
+cv.result <- rbindlist(cv.result, idcol="test.fold")
+```
+
+The Pearson correlation coefficient between predicted and actual responses, obtained by 4-fold cross-validation is given by `r cv.result[, cor(gi.score.real, gi.score.prd)]`. The MSE is given by `r cv.result[, mean((gi.score.prd-gi.score.real)^2)]`.
+
+Plots (two versions) of the actual versus predicted responses is given below:
+
+```{r}
+# scatter plot
+qplot(cv.result$gi.score.prd, cv.result$gi.score.real, xlab="Predicted GI Score", ylab="Actual GI Score") + theme_classic()
+# binned boxplots
+p <- ggplot(cv.result, aes(x=gi.score.prd, y=gi.score.real, group=cut_interval(gi.score.prd, n=8))) +
+  geom_boxplot() +
+  xlab("Predicted GI Score") +
+  ylab("Actual GI Score") +
+  theme_classic()
+p
+```
+
+
+# Real Data
+
+```{r}
+#dat <- fread("data/collins-sc-emap-gis.tsv")
+```
