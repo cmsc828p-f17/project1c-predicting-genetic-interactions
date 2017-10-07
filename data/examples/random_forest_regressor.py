@@ -53,8 +53,8 @@ def build_geneterm_dict(genes, term_set):
                     gene_dict[gene].append(idx)
     return gene_dict
 
-def construct_feature_vector(gene_pairs, gene_dict, pair_scores):
-    feature_vector = np.zeros([4950, 100])  # 4950 x (99+1)  4950 gene combination(assume (g1,g2) is equivalent to (g2,g1))
+def construct_feature_vector(gene_pairs, gene_dict, pair_scores, num_terms):
+    feature_vector = np.zeros([len(gene_pairs), num_terms+1])  # 4950 x (99+1)  4950 gene combination(assume (g1,g2) is equivalent to (g2,g1))
     row_idx = 0
     for idx,(gene1,gene2) in enumerate(gene_pairs):
         terms_i = gene_dict[gene1]
@@ -120,7 +120,7 @@ if __name__ == "__main__":
     gene_dict = build_geneterm_dict(genes, term_set)
 
     # construct feature vector
-    feature_vector = construct_feature_vector(gene_pairs,gene_dict, pair_scores)
+    feature_vector = construct_feature_vector(gene_pairs,gene_dict, pair_scores, num_terms)
     feature_vector = np.asarray(feature_vector)
 
     # separate into features and scores
