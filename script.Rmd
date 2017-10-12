@@ -99,7 +99,7 @@ p
 ```{r}
 # gi scores, already unique pairs
 dat <- fread("data/collins-sc-emap-gis.tsv")
-set.names(dat, c("gene1","gene2","gi.score","gi.type"))
+setnames(dat, c("gene1","gene2","gi.score","gi.type"))
 # gene to GO term mapping
 go.dat <- fread("data/GO.tsv")
 go.dat <- go.dat[Gene %in% dat[, c(gene1,gene2)]]
