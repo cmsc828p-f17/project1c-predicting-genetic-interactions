@@ -104,7 +104,6 @@ def CrossValidation(X,y,num_split):
 if __name__ == "__main__":
     # read terms
     term_set = read_interactions()
-
     # read gene list
     genes = read_genes()
     num_terms = len(term_set)  # 99 terms

@@ -95,7 +95,7 @@ def build_geneterm_dict(genes, term_set):
 
 def construct_feature_vector(gene_pairs, gene_dict, pair_scores, num_terms):
     feature_vector = np.zeros([len(gene_pairs), num_terms+1])
-    # only interaction pairs(664x663/2) x (5125+1)  4950 gene combination(assume (g1,g2) is equivalent to (g2,g1))
+    # only interaction pairs(664x663/2) x (5125+1)  assume (g1,g2) is equivalent to (g2,g1)
     row_idx = 0
     for idx,(gene1,gene2) in enumerate(gene_pairs):
         if gene1 in gene_dict and gene2 in gene_dict:
