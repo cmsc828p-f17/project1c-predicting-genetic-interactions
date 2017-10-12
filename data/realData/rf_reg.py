@@ -223,3 +223,6 @@ if __name__ == "__main__":
 # 1                      2115  6910   5076
 # 2                      2808  5773   8043
 
+# Final correlations is: 0.382299211215
+# Box plot see Scores.png
+
