@@ -3,9 +3,14 @@ import cPickle as pickle
 import numpy
 import itertools
 from sklearn.ensemble import RandomForestRegressor
-from sklearn.metrics import r2_score
-SIMULATED_DATA = True
+from sklearn.model_selection import cross_val_score
 
+
+# Flag to control execution for simulated data or the real data
+SIMULATED_DATA = False
+
+# Featurize a given gene1, gene2, score pair, given
+# the gos dictionary and ordered list of gos (keys)
 def featurize(keys, gos, gene1, gene2, num):
     feature_vector = [0] * num
     for idx in xrange(0, num):
@@ -16,6 +21,7 @@ def featurize(keys, gos, gene1, gene2, num):
         feature_vector[idx] = tot
     return feature_vector
 
+# Read in gos data from saved pickle file if exists, otherwise parse it and save pickle
 if not SIMULATED_DATA:
     if not os.path.exists("gos.pickle"):
         print("Beginning go parsing.")
@@ -78,12 +84,14 @@ else:
         with open("data/examples/example-gene-names.txt") as f:
             idx = 0
             lookup = {}
+            # Collect all of the gene names into a lookup list to associate gene name with index
             for line in f:
                 lookup[line.strip()] = idx
                 idx += 1
+        # Read in the gene scores
         gene_scores = numpy.load("data/examples/example-genetic-interactions.npy")
-        print gene_scores
         genes = lookup.keys()
+        # Iterate over every pair of genes, get it's score from gene_scores, and collect that info for training.
         for gene1, gene2 in itertools.combinations(genes, 2):
             score = gene_scores[lookup[gene1]][lookup[gene2]]
             ys.append(float(score))
@@ -94,20 +102,12 @@ else:
         print("Reading simulated gene featurization from file.")
         xs, ys = pickle.load(open("simulated.pickle", "rb"))
 
-print("Have gos, xs, ys. Computing split: "),
-split = int(len(xs) * 0.75)
-print("%d" % split)
-train_xs = xs[:split]
-train_ys = ys[:split]
-test_xs = xs[split:]
-test_ys = ys[split:]
-print("Creating regressor, and fitting.")
-regr = RandomForestRegressor()
-regr.fit(train_xs, train_ys)
-print("Predicting...")
-preds = regr.predict(test_xs)
-print("Confusing...")
-print numpy.corrcoef(test_ys, preds)
-print r2_score(test_ys, preds)
 
+
+print("Have gos, xs, ys. ")
+print("Creating regressor, and cross validating 10 times.")
+regr = RandomForestRegressor()
+#regr.fit(xs, train_ys)
+#preds = regr.predict(xs)
+print(cross_val_score(regr, xs, ys, cv=10))
 
