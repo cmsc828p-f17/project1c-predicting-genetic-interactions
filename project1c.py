@@ -107,7 +107,5 @@ else:
 print("Have gos, xs, ys. ")
 print("Creating regressor, and cross validating 10 times.")
 regr = RandomForestRegressor()
-#regr.fit(xs, train_ys)
-#preds = regr.predict(xs)
 print(cross_val_score(regr, xs, ys, cv=10))
 
