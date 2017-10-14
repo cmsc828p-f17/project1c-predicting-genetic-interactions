@@ -15,7 +15,7 @@ cv.result <- lapply(1:4, function(i) {
   train <- folds!=i
   test <- dat[!train]
   set.seed(1)
-  rf <- ranger(gi.score ~ ., data=dat[train, c(-1,-2,-4)], num.trees=500, mtry=floor((length(dat)-4)/3), num.threads=24L)
+  rf <- ranger(gi.score ~ ., data=dat[train, c(-1,-2,-4)], num.trees=300, mtry=floor((length(dat)-4)/3), num.threads=24L)
   prd <- predictions(predict(rf, data=test))
   test[, .(gene1, gene2, gi.score.real=gi.score, gi.score.prd=prd)]
 })
