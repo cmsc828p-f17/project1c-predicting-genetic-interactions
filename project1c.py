@@ -4,10 +4,10 @@ import numpy
 import itertools
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.model_selection import cross_val_score
-
+import random
 
 # Flag to control execution for simulated data or the real data
-SIMULATED_DATA = False
+SIMULATED_DATA = True
 
 # Featurize a given gene1, gene2, score pair, given
 # the gos dictionary and ordered list of gos (keys)
@@ -79,8 +79,8 @@ else:
     ys = []
     xs = []
     idx = 0
-
-    if not os.path.exists("simulated.pickle"):
+    if True:
+#    if not os.path.exists("simulated.pickle"):
         with open("data/examples/example-gene-names.txt") as f:
             idx = 0
             lookup = {}
@@ -92,20 +92,34 @@ else:
         gene_scores = numpy.load("data/examples/example-genetic-interactions.npy")
         genes = lookup.keys()
         # Iterate over every pair of genes, get it's score from gene_scores, and collect that info for training.
-        for gene1, gene2 in itertools.combinations(genes, 2):
-            score = gene_scores[lookup[gene1]][lookup[gene2]]
-            ys.append(float(score))
-            xs.append(featurize(keys, gos, gene1, gene2, num))
+        #for gene1, gene2 in itertools.combinations(genes, 2):
+        #    score = gene_scores[lookup[gene1]][lookup[gene2]]
+        #    xs.append(featurize(keys, gos, ("Gene-%d"%(i+1)), ("Gene-%d"%(j+1)), num))
+        for i in range(100):
+            for j in range(i+1, 100):
+                score = gene_scores[i][j]
+                ys.append(float(score))
+                idx = 0
+                gene_v = [0]*100
+                for gene_set in genes:
+                    gene_v[idx] += 1 if ("Gene-%d"%(i + 1)) in gene_set else 0
+                    gene_v[idx] += 1 if ("Gene-%d"%(j + 1)) in gene_set else 0
+                    idx += 1
+                xs.append(gene_v)
             #print gene1, gene2, score
         pickle.dump((xs, ys), open("simulated.pickle", "wb"))
-    else:
-        print("Reading simulated gene featurization from file.")
-        xs, ys = pickle.load(open("simulated.pickle", "rb"))
+#    else:
+#        print("Reading simulated gene featurization from file.")
+#        xs, ys = pickle.load(open("simulated.pickle", "rb"))
+shuffler = list(zip(xs, ys))
+random.shuffle(shuffler)
+xs, ys = zip(*shuffler)
 
 
-
+open("xs.out", "w").write("\n".join(str(x) for x in xs))
+open("ys.out", "w").write("\n".join(str(y) for y in ys))
 print("Have gos, xs, ys. ")
-print("Creating regressor, and cross validating 10 times.")
-regr = RandomForestRegressor()
-print(cross_val_score(regr, xs, ys, cv=10))
+print("Creating regressor with 300 trees, and cross validating 4 times.")
+regr = RandomForestRegressor(n_estimators=300)
+print(cross_val_score(regr, xs, ys, cv=4))
 
