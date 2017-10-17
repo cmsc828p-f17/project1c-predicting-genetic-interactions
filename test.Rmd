@@ -70,7 +70,7 @@ cv.result <- lapply(1:4, function(i) {
   train <- folds!=i
   test <- sim.dat[!train]
   set.seed(1)
-  rf <- ranger(gi.score ~ ., data=sim.dat[train,-1:-2], num.trees=500, mtry=floor(length(go)/3))
+  rf <- ranger(gi.score ~ ., data=sim.dat[train,-1:-2], num.trees=10, mtry=floor(length(go)/3))
   prd <- predictions(predict(rf, data=test))
   test[, .(gene1, gene2, gi.score.real=gi.score, gi.score.prd=prd)]
 })
