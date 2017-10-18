@@ -3,7 +3,8 @@ import cPickle as pickle
 import numpy
 import itertools
 from sklearn.ensemble import RandomForestRegressor
-from sklearn.model_selection import cross_val_score
+from sklearn.model_selection import cross_val_predict
+from scipy.stats import pearsonr
 import random
 
 # Flag to control execution for simulated data or the real data
@@ -92,9 +93,6 @@ else:
         gene_scores = numpy.load("data/examples/example-genetic-interactions.npy")
         genes = lookup.keys()
         # Iterate over every pair of genes, get it's score from gene_scores, and collect that info for training.
-        #for gene1, gene2 in itertools.combinations(genes, 2):
-        #    score = gene_scores[lookup[gene1]][lookup[gene2]]
-        #    xs.append(featurize(keys, gos, ("Gene-%d"%(i+1)), ("Gene-%d"%(j+1)), num))
         for i in range(100):
             for j in range(i+1, 100):
                 score = gene_scores[i][j]
@@ -102,8 +100,8 @@ else:
                 idx = 0
                 gene_v = [0]*100
                 for gene_set in genes:
-                    gene_v[idx] += 1 if ("Gene-%d"%(i + 1)) in gene_set else 0
-                    gene_v[idx] += 1 if ("Gene-%d"%(j + 1)) in gene_set else 0
+                    gene_v[idx] += 1 if ("Gene-%d" % (i + 1)) in gene_set else 0
+                    gene_v[idx] += 1 if ("Gene-%d" % (j + 1)) in gene_set else 0
                     idx += 1
                 xs.append(gene_v)
             #print gene1, gene2, score
@@ -116,10 +114,8 @@ random.shuffle(shuffler)
 xs, ys = zip(*shuffler)
 
 
-open("xs.out", "w").write("\n".join(str(x) for x in xs))
-open("ys.out", "w").write("\n".join(str(y) for y in ys))
 print("Have gos, xs, ys. ")
-print("Creating regressor with 300 trees, and cross validating 4 times.")
-regr = RandomForestRegressor(n_estimators=300)
-print(cross_val_score(regr, xs, ys, cv=4))
-
+print("Creating regressor with 10 trees, and cross validating 4 times.")
+regr = RandomForestRegressor(n_estimators=10)
+preds = cross_val_predict(regr, xs, ys, cv=4)
+print pearsonr(preds, ys)[0]
