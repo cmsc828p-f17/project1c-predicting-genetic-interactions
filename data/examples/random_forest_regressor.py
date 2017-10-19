@@ -82,8 +82,9 @@ def CrossValidation(X,y,num_split):
     k_fold.get_n_splits(X)
 
     # create random forest regressor
-    regr = RandomForestRegressor(max_depth=None, random_state=0)
+    regr = RandomForestRegressor()
     # fit on the training set
+    corr_all = []
     for k, (train, test) in enumerate(k_fold.split(X, y)):
         print("training size:",len(train),"testing size:",len(test))
         regr.fit(X[train], y[train])
@@ -93,12 +94,19 @@ def CrossValidation(X,y,num_split):
         correlation = scipy.stats.pearsonr(true_score, pred_score)
         print("For fold: ", k, ", the correlations is:", correlation[0])
 
+        # all to corr_all
+        corr_all.append(correlation[0])
+
         # label the interactions from the scores
         preds_label = label_interaction(pred_score)
         true_label = label_interaction(true_score)
         # generate confusion matrix
         confusion_matrix = pd.crosstab(pd.Series(true_label), pd.Series(preds_label), rownames=['Actual interaction'], colnames=['Predicted interaction'])
         print(confusion_matrix,"\n")
+
+    corr_from_bestmodel = max(corr_all)
+    print("the final result is: ", corr_from_bestmodel)
+
 
 
 if __name__ == "__main__":
@@ -128,4 +136,43 @@ if __name__ == "__main__":
 
     # four-fold cross validation
     CrossValidation(X,y,4)
+
+    # return final correlation
+
+
+
+#######result
+# training size: 3712 testing size: 1238
+# For fold:  0 , the correlations is: 0.0444730307486
+# Predicted interaction    0    1    2
+# Actual interaction
+# 0                       17   56   31
+# 1                      118  277  204
+# 2                      102  235  198
+#
+# training size: 3712 testing size: 1238
+# For fold:  1 , the correlations is: 0.0258415069753
+# Predicted interaction   0    1    2
+# Actual interaction
+# 0                      12   59   49
+# 1                      80  261  242
+# 2                      72  245  218
+#
+# training size: 3713 testing size: 1237
+# For fold:  2 , the correlations is: -0.00599179554809
+# Predicted interaction    0    1    2
+# Actual interaction
+# 0                       14   50   44
+# 1                       89  246  236
+# 2                      114  239  205
+#
+# training size: 3713 testing size: 1237
+# For fold:  3 , the correlations is: 0.0729548343123
+# Predicted interaction   0    1    2
+# Actual interaction
+# 0                      19   40   49
+# 1                      81  277  211
+# 2                      76  235  249
+#
+# the final result is:  0.0729548343123
 
