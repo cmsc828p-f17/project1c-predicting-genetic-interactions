@@ -39,4 +39,15 @@ p <- ggplot(cv.result, aes(x=gi.score.prd, y=gi.score.real, group=cut_interval(g
   ylab("Actual GI Score") +
   theme_classic()
 p
+# histogram of number of samples in each bin
+qplot(cv.result$gi.score.prd, xlab="Predicted GI Score", bins=8, log="y") + theme_classic()
+
+# swap x-y axes
+q <- ggplot(cv.result, aes(x=gi.score.real, y=gi.score.prd, group=cut_interval(gi.score.real, n=8))) +
+  geom_boxplot() +
+  xlab("Actual GI Score") +
+  ylab("Predicted GI Score") +
+  theme_classic()
+q
+qplot(cv.result$gi.score.real, xlab="Actual GI Score", bins=8, log="y") + theme_classic()
 ```
