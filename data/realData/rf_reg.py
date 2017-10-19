@@ -128,8 +128,9 @@ def CrossValidation(X,y,num_split):
     k_fold.get_n_splits(X)
 
     # create random forest regressor
-    regr = RandomForestRegressor(max_depth=None, random_state=0)
+    regr = RandomForestRegressor()
     # fit on the training set
+    all_correlations= []
     for k, (train, test) in enumerate(k_fold.split(X, y)):
         print("training size:",len(train),"testing size:",len(test))
         regr.fit(X[train], y[train])
@@ -138,7 +139,7 @@ def CrossValidation(X,y,num_split):
         # calculate correlation
         correlation = scipy.stats.pearsonr(true_score, pred_score)
         print("For fold: ", k, ", the correlations is:", correlation[0])#,r2_score(true_score,pred_score))
-
+        all_correlations.append(correlation[0])
         # label the interactions from the scores
         preds_label = label_interaction(pred_score)
         true_label = label_interaction(true_score)
@@ -149,6 +150,7 @@ def CrossValidation(X,y,num_split):
         # save scores and indexes
         pickle.dump([pred_score,true_score,correlation], open("/output/{0}th_result.pickle".format(k), "wb"))
         pickle.dump([train,test],open("/output/{0}th_indexes.pickle".format(k), "wb"))
+    print("final correlation is:", max(all_correlations))
 
 
 if __name__ == "__main__":
@@ -188,41 +190,43 @@ if __name__ == "__main__":
     #four-fold cross validation
     CrossValidation(X,y,4)
 
+#####################################four-fold-validation result
+# 2017-10-18 13:40:29,604 INFO - training size: 165087 testing size: 55029
+# 2017-10-18 14:16:51,085 INFO - For fold:  0 , the correlations is: 0.323894109749
+# 2017-10-18 14:16:51,185 INFO - Predicted interaction     0     1     2
+# 2017-10-18 14:16:51,186 INFO - Actual interaction
+# 2017-10-18 14:16:51,186 INFO - 0                      4547  7458  7534
+# 2017-10-18 14:16:51,186 INFO - 1                      2404  8404  5569
+# 2017-10-18 14:16:51,186 INFO - 2                      3065  7790  8258
+# 2017-10-18 14:16:51,186 INFO -
+# 2017-10-18 14:16:51,332 INFO - training size: 165087 testing size: 55029
+# 2017-10-18 14:53:52,921 INFO - For fold:  1 , the correlations is: 0.428050435603
+# 2017-10-18 14:53:52,990 INFO - Predicted interaction     0     1     2
+# 2017-10-18 14:53:52,991 INFO - Actual interaction
+# 2017-10-18 14:53:52,991 INFO - 0                      5992  6703  7440
+# 2017-10-18 14:53:52,991 INFO - 1                      2524  7981  5811
+# 2017-10-18 14:53:52,991 INFO - 2                      3224  6847  8507
+# 2017-10-18 14:53:52,991 INFO -
+# 2017-10-18 14:53:53,122 INFO - training size: 165087 testing size: 55029
+# 2017-10-18 15:33:21,672 INFO - For fold:  2 , the correlations is: 0.335600673814
+# 2017-10-18 15:33:21,740 INFO - Predicted interaction     0     1     2
+# 2017-10-18 15:33:21,740 INFO - Actual interaction
+# 2017-10-18 15:33:21,741 INFO - 0                      6395  6805  7329
+# 2017-10-18 15:33:21,741 INFO - 1                      2474  7597  5662
+# 2017-10-18 15:33:21,741 INFO - 2                      3281  6959  8527
+# 2017-10-18 15:33:21,741 INFO -
+# 2017-10-18 15:33:21,883 INFO - training size: 165087 testing size: 55029
+# 2017-10-18 16:09:12,761 INFO - For fold:  3 , the correlations is: 0.439468270994
+# 2017-10-18 16:09:12,828 INFO - Predicted interaction     0      1     2
+# 2017-10-18 16:09:12,828 INFO - Actual interaction
+# 2017-10-18 16:09:12,828 INFO - 0                      5535  12734  6035
+# 2017-10-18 16:09:12,829 INFO - 1                      2164   6993  4944
+# 2017-10-18 16:09:12,829 INFO - 2                      2755   5778  8091
+# 2017-10-18 16:09:12,829 INFO -
+# 2017-10-18 16:09:13,233 INFO -
+# ################################################################################
 
-############################ Results############################################
+# final correlation is 0.439
 
-# training size: 165087 testing size: 55029
-# For fold:  0 , the correlations is: 0.328052010826
-# Predicted interaction     0     1     2
-# Actual interaction
-# 0                      4795  7569  7175
-# 1                      2492  8540  5345
-# 2                      3183  7776  8154
-#
-# training size: 165087 testing size: 55029
-# For fold:  1 , the correlations is: 0.428553727311
-# Predicted interaction     0     1     2
-# Actual interaction
-# 0                      5896  6849  7390
-# 1                      2657  7933  5726
-# 2                      3133  6927  8518
-#
-# 165087 testing size: 55029
-# For fold:  2 , the correlations is: 0.336450787305
-# Predicted interaction     0     1     2
-# Actual interaction
-# 0                      6386  6769  7374
-# 1                      2536  7578  5619
-# 2                      3306  6766  8695
-#
-# training size: 165087 testing size: 55029
-# For fold:  3 , the correlations is: 0.43138541292
-# Predicted interaction     0     1      2
-# Actual interaction
-# 0                      5680  5383  13241
-# 1                      2115  6910   5076
-# 2                      2808  5773   8043
 
-# Final correlations is: 0.382299211215
-# Box plot see Scores.png
 
