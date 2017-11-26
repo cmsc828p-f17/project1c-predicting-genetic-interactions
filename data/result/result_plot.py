@@ -10,7 +10,7 @@ pred_score = []
 true_score = []
 correlations =  []
 for i in range(4):
-    p,t,c = pickle.load(open("./final_result/{0}th_result.pickle".format(i), "rb"))
+    p,t,c = pickle.load(open("/home/wenyanli/cmsc828p/project1c-predicting-genetic-interactions/data/result/{0}th_result.pickle".format(i), "rb"))
     pred_score.extend(p)
     true_score.extend(t)
     correlations.append(c[0])
@@ -45,4 +45,4 @@ plt.xlabel('Predicted Interaction Score')
 plt.ylabel('Measured Interaction Score')
 plt.title('Scores')
 plt.show()
-plt.savefig("./final_results/scores.png")
+# plt.savefig("./final_results/scores.png")
