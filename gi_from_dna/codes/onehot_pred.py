@@ -359,14 +359,16 @@ def train_minibatch(train_data,eval_data,batch_size,epoch,start_epoch = 0, print
             }, is_best)
 
         batch_i += 1  # update batch index
-    return loss_rec
+    return loss_rec,acc_all
 
 num_epochs = 15
 losses_all = []
+eval_acc_all = []
 for epoch in range(num_epochs):
     print("Epoch: %d/%d"%(epoch,num_epochs))
-    loss_rec = train_minibatch(train_data,dev_data,batchSize,epoch)
+    loss_rec, acc_all= train_minibatch(train_data,dev_data,batchSize,epoch)
     losses_all.extend(loss_rec)
+    eval_acc_all.extend(acc_all)
 
 predicted, true, attn= evaluate(batchSize, test_data)
 acc = get_correlation(true,predicted)
@@ -380,6 +382,8 @@ with open('/output/test_data.pickle', 'wb') as d:
     pickle.dump(test_data, d)
 with open('/output/training_loss.pickle','wb') as f:
     pickle.dump(losses_all,f)
+with open('/output/eval_accuracy.pickle','wb') as f:
+    pickle.dump(eval_acc_all)
 
 torch.save(interaction_predictor.state_dict(), '/output/vp.dat')
 
