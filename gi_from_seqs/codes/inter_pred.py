@@ -62,7 +62,7 @@ def get_batch(batch_size, data, idx=0):
     return input_var,target_var
 
 
-def save_checkpoint(state, is_best, filename='/output/checkpoint.pth.tar'):
+def save_checkpoint(state, is_best, filename='../output/checkpoint.pth.tar'):
     """Save checkpoint if a new best is achieved"""
     if is_best:
         print ("=> Saving a new best")
@@ -380,12 +380,12 @@ print("test accuracy: ", acc)
 
 
 # ## save model and output for further analysis
-with open('/output/output.pickle', 'wb') as f:
+with open('../output/output.pickle', 'wb') as f:
     pickle.dump([predicted, true, attn], f)
-with open('/output/test_data.pickle', 'wb') as d:
+with open('../output/test_data.pickle', 'wb') as d:
     pickle.dump(test_data, d)
-with open('/output/training_loss.pickle','wb') as f:
+with open('../output/training_loss.pickle','wb') as f:
     pickle.dump(losses_all,f)
 
-torch.save(interaction_predictor.state_dict(), '/output/vp.dat')
+torch.save(interaction_predictor.state_dict(), '../output/vp.dat')
 

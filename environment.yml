@@ -1,0 +1,17 @@
+name: dl
+
+channels:
+  - conda-forge
+  - pytorch
+  - default
+
+dependencies:
+  - python=3.6
+  - numpy=1.*
+  - networkx=2.*
+  - scikit-learn=0.*
+  - h5py=2.*
+  - pandas=0.*
+  - matplotlib=2.*
+  - pytorch
+  - torchvision

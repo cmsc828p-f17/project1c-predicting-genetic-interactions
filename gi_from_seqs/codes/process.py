@@ -61,9 +61,9 @@ def dna_sequence_reader(INPUT_DIR, FILE):
 def obtain_interactions(floyd):
     interactions = []
     if floyd:
-        FILE = '/input/collins-sc-emap-gis.tsv'
+        FILE = '../input/collins-sc-emap-gis.tsv'
     else:
-        FILE = '/home/wenyanli/cmsc828p/project1c-predicting-genetic-interactions/data/real_data/input/collins-sc-emap-gis.tsv'
+        FILE = '../input/collins-sc-emap-gis.tsv'
     with open(FILE) as tsvfile:
         reader = csv.reader(tsvfile, delimiter='\t')
         for row in reader:
@@ -133,9 +133,8 @@ def build_protein_vocab(fixed_len_protein_dict,floyd_flag=False):
         index2protein[v] = k
 
     # save index2protein
-    if floyd_flag:
-        with open('/output/protein_vocab.pickle', 'wb') as f:
-            pickle.dump(index2protein, f)
+    with open('../output/protein_vocab.pickle', 'wb') as f:
+        pickle.dump(index2protein, f)
     return protein2index, index2protein
 
 def pairing_data(X, Y):
@@ -181,9 +180,9 @@ def get_inputs(feature_vectors, target_scores):
 
 def load_data(floyd_flag=False):
     if floyd_flag:
-        INPUT_DIR = "/input/"
+        INPUT_DIR = "../input/"
     else:
-        INPUT_DIR = "/home/wenyanli/cmsc828p/project1c-predicting-genetic-interactions/gi_from_seqs/input/"
+        INPUT_DIR = "../input/"
 
     FILE = "protein_seqs"
     # obtain interactions information
@@ -216,9 +215,9 @@ def load_data(floyd_flag=False):
 
 def load_dna_data(floyd_flag=False):
     if floyd_flag:
-        INPUT_DIR = "/input/"
+        INPUT_DIR = "../input/"
     else:
-        INPUT_DIR = "/home/wenyanli/cmsc828p/project1c-predicting-genetic-interactions/gi_from_seqs/input"
+        INPUT_DIR = "../input"
 
     FILE = "dna_seqs"
     gene_seq_dict, dna_seqs, genes = dna_sequence_reader(INPUT_DIR, FILE)
@@ -227,5 +226,4 @@ def load_dna_data(floyd_flag=False):
     # obtain fixed length seq dict
     fixed_length_dict = get_fixed_length_sequence(interaction_genes, gene_seq_dict, SEQ_LEN)
     base2index, index2base = build_protein_vocab(fixed_length_dict, floyd_flag)
-
 
