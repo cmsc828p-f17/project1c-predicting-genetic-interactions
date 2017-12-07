@@ -41,9 +41,9 @@ def dna_sequence_reader(INPUT_DIR, FILE):
 def obtain_interactions(floyd):
     interactions = []
     if floyd:
-        FILE = '/input/collins-sc-emap-gis.tsv'
+        FILE = '../input/collins-sc-emap-gis.tsv'
     else:
-        FILE = '/home/wenyanli/cmsc828p/project1c-predicting-genetic-interactions/data/real_data/input/collins-sc-emap-gis.tsv'
+        FILE = '../input/collins-sc-emap-gis.tsv'
     with open(FILE) as tsvfile:
         reader = csv.reader(tsvfile, delimiter='\t')
         for row in reader:
@@ -134,7 +134,7 @@ def build_base_vocab(gene_seq_dict,floyd_flag=False):
 
     # save index2protein
     if floyd_flag:
-        with open('/output/protein_vocab.pickle', 'wb') as f:
+        with open('../output/protein_vocab.pickle', 'wb') as f:
             pickle.dump(index2base, f)
     else:
         with open('../output/protein_vocab.pickle', 'wb') as f:
@@ -183,7 +183,7 @@ def get_inputs(feature_vectors, target_scores):
 
 def load_dna_data(floyd_flag=False):
     if floyd_flag:
-        INPUT_DIR = "/input/"
+        INPUT_DIR = "../input/"
     else:
         INPUT_DIR = "../input"
 
@@ -216,7 +216,7 @@ def load_dna_data(floyd_flag=False):
 
 def load_one_hot_data(floyd_flag):
     if floyd_flag:
-        INPUT_DIR = "/input/"
+        INPUT_DIR = "../input/"
     else:
         INPUT_DIR = "../input"
 
