@@ -1,0 +1,53 @@
+---
+title: "Predicting Genetic Interaction Scores in Yeast With Random Forests"
+author: "Kuoyuan Cheng"
+date: '`r format(Sys.Date(), "%B %d, %Y")`'
+header-includes:
+   - \setlength\parindent{12pt}
+   - \usepackage{float}
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+#knitr::opts_chunk$set(echo=FALSE, message=FALSE, warning=FALSE, tidy.opts=list(width.cutoff=60), tidy=TRUE)
+knitr::opts_chunk$set(echo=FALSE, message=FALSE, warning=FALSE, tidy.opts=list(width.cutoff=100), tidy=TRUE)
+knitr::opts_chunk$set(fig.width=5, fig.height=3.1, fig.pos="H", fig.align="center")
+
+library(data.table)
+library(ggplot2)
+```
+
+
+# Real Data
+
+```{r}
+#load result
+load("cv.result.RData")
+```
+
+The Pearson correlation coefficient between predicted and actual responses, obtained by 4-fold cross-validation is given by `r cv.result[, cor(gi.score.real, gi.score.prd)]`. The MSE is given by `r cv.result[, mean((gi.score.prd-gi.score.real)^2)]`.
+
+Plots (two versions) of the actual versus predicted responses is given below:
+
+```{r}
+# scatter plot
+qplot(cv.result$gi.score.prd, cv.result$gi.score.real, xlab="Predicted GI Score", ylab="Actual GI Score") + theme_classic()
+# binned boxplots
+p <- ggplot(cv.result, aes(x=gi.score.prd, y=gi.score.real, group=cut_interval(gi.score.prd, n=8))) +
+  geom_boxplot() +
+  xlab("Predicted GI Score") +
+  ylab("Actual GI Score") +
+  theme_classic()
+p
+# histogram of number of samples in each bin
+qplot(cv.result$gi.score.prd, xlab="Predicted GI Score", bins=8, log="y") + theme_classic()
+
+# swap x-y axes
+q <- ggplot(cv.result, aes(x=gi.score.real, y=gi.score.prd, group=cut_interval(gi.score.real, n=8))) +
+  geom_boxplot() +
+  xlab("Actual GI Score") +
+  ylab("Predicted GI Score") +
+  theme_classic()
+q
+qplot(cv.result$gi.score.real, xlab="Actual GI Score", bins=8, log="y") + theme_classic()
+```
